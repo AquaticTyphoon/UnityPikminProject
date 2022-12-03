@@ -37,7 +37,7 @@ public class OlimarMain : MonoBehaviour
     private void Update(){
 
       inputVector= olimarControl.Player.WASD.ReadValue<Vector2>();
-      Vector3 localTarget = new Vector3(inputVector.x, olimarRigidbody.velocity.y, inputVector.y) * speed;
+      Vector3 localTarget = new Vector3(inputVector.x, olimarRigidbody.transform.position.y, inputVector.y) * speed;
 
       olimarRigidbody.velocity =  transform.TransformDirection(localTarget);
 
