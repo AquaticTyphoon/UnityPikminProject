@@ -17,6 +17,10 @@ public class OlimarMain : MonoBehaviour
     public GameObject olimarCam;
     public Vector3 camOffset;
 
+    public bool controlEnabled = true;
+
+    public bool strafeControls = false;
+
     void Start()
     {
       animator = GetComponent<Animator>();
@@ -35,33 +39,46 @@ public class OlimarMain : MonoBehaviour
     }
 
     private void Update(){
+      if(controlEnabled == true){
+          inputVector= olimarControl.Player.WASD.ReadValue<Vector2>();
+          Vector3 localTarget = new Vector3(inputVector.x, olimarRigidbody.transform.position.y, inputVector.y) * speed;
 
-      inputVector= olimarControl.Player.WASD.ReadValue<Vector2>();
-      Vector3 localTarget = new Vector3(inputVector.x, olimarRigidbody.transform.position.y, inputVector.y) * speed;
+          if(strafeControls){
+            speed = Mathf.Clamp(cursorToOlimarDistance, 0.7f, 1.5f);
+            olimarRigidbody.velocity =  transform.TransformDirection(localTarget);
+          }else{
+            speed = 1.1f;
+            olimarRigidbody.velocity =  localTarget;
+          }
 
-      olimarRigidbody.velocity =  transform.TransformDirection(localTarget);
 
-      cursorToOlimarDistance = Vector3.Distance (pikminCursor.transform.position, olimarRigidbody.transform.position);
+          cursorToOlimarDistance = Vector3.Distance (pikminCursor.transform.position, olimarRigidbody.transform.position);
+          if(cursorToOlimarDistance >= 0.2f && inputVector != Vector2.zero && (pikminCursor.transform.rotation.normalized.y  != transform.rotation.normalized.y)){
+            Vector3 target = new Vector3(pikminCursor.transform.position.x, transform.position.y, pikminCursor.transform.position.z);
+            if(strafeControls){
+              transform.LookAt(target);
+            }else{
+              transform.LookAt(transform.position + new Vector3(inputVector.x, transform.position.y, inputVector.y));
+            }
 
-      if(cursorToOlimarDistance >= 0.2f && inputVector != Vector2.zero && (pikminCursor.transform.rotation.normalized.y  != transform.rotation.normalized.y)){
-        Vector3 target = new Vector3(pikminCursor.transform.position.x, transform.position.y, pikminCursor.transform.position.z);
-        transform.LookAt(target);
+          }
+        
+        if(olimarControl.Player.Interact.inProgress){
+          if(cursorToOlimarDistance >= 0.2f && (pikminCursor.transform.rotation.normalized.y  != transform.rotation.normalized.y)){
+            Vector3 target = new Vector3(pikminCursor.transform.position.x, transform.position.y, pikminCursor.transform.position.z);
+            transform.LookAt(target);
 
+          }    
+        }
       }
+        
+        animator.SetFloat("Speed", speed);
+        if(inputVector != Vector2.zero){
+          animator.SetBool("IsMoving", true);
+        }else{
+          animator.SetBool("IsMoving", false);
+        }
 
-      speed = Mathf.Clamp(cursorToOlimarDistance, 0.7f, 1.5f);
-
-      animator.SetFloat("Speed", speed);
-
-      if(inputVector != Vector2.zero){
-        animator.SetBool("IsMoving", true);
-      }else{
-        animator.SetBool("IsMoving", false);
-      }
-      
-      
-
-      
     }
     
 }
