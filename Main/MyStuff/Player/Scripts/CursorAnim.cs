@@ -7,6 +7,6 @@ public class CursorAnim : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        transform.Rotate(0,0,-0.125f, Space.Self);
+        transform.Rotate(0,0, -0.2f, Space.Self);
     }
 }
